@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - '80:80'         # Public HTTP traffic (required for Let's Encrypt SSL challenges)
+      - '81:81'         # Admin Web UI port
+      - '443:443'       # Public HTTPS traffic
+    environment:
+      DISABLE_IPV6: 'true'
+    volumes:
+      - ./data:/data        # Persistent configuration and certificates
+      - ./letsencrypt:/etc/letsencrypt  # Let's Encrypt SSL persistence
+      - ../certs:/etc/ssl/certs/custom:ro  # <--- Add this line to mount your custom certificates
+    networks:
+      - npm-net
+
+networks:
+  npm-net:
+    driver: bridge
